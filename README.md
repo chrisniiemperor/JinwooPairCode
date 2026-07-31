@@ -9,8 +9,8 @@
 - **1) Create a Mega.nz account**  
   [![MEGA - Create Account](https://img.shields.io/badge/MEGA-Create%20Account-red?logo=mega&logoColor=white)](https://mega.nz)
 
-- **2) Paste your credentials in `mega.js`**  
-  Open `mega.js` and update `email` and `password`:
+- **2) Paste your credentials in `.env`**  
+  Open `.env` and update `email` and `password`:
 
 ```js
 // mega.js
