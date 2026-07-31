@@ -13,7 +13,7 @@
   Open `.env` and update `email` and `password`:
 
 ```js
-// mega.js
+// .env
 const auth = {
   email: 'your-email@domain.com',
   password: 'your-strong-password',
