@@ -1,133 +1,91 @@
-import express from 'express';
-import fs from 'fs';
-import path from 'path';
-import pino from 'pino';
-
+import express from "express";
+import fs from "fs";
+import path from "path";
+import pino from "pino";
 import {
     makeWASocket,
     useMultiFileAuthState,
     delay,
     makeCacheableSignalKeyStore,
     Browsers,
-    fetchLatestBaileysVersion,
-    DisconnectReason
-} from '@whiskeysockets/baileys';
-
-import pn from 'awesome-phonenumber';
+    DisconnectReason,
+    fetchLatestBaileysVersion
+} from "@whiskeysockets/baileys";
+import pn from "awesome-phonenumber";
 
 const router = express.Router();
 
 const logger = pino({
-    level: process.env.NODE_ENV === 'production' ? 'warn' : 'info'
+    level: "info"
 });
 
-/*
-|--------------------------------------------------------------------------
-| Session directory
-|--------------------------------------------------------------------------
-*/
+const sessionsDir = path.resolve("./sessions");
 
-const SESSION_ROOT = path.join(process.cwd(), 'sessions');
-
-if (!fs.existsSync(SESSION_ROOT)) {
-    fs.mkdirSync(SESSION_ROOT, {
+if (!fs.existsSync(sessionsDir)) {
+    fs.mkdirSync(sessionsDir, {
         recursive: true
     });
 }
 
-/*
-|--------------------------------------------------------------------------
-| Remove session
-|--------------------------------------------------------------------------
-*/
-
-function removeFile(filePath) {
+function removeSession(dir) {
     try {
-        if (fs.existsSync(filePath)) {
-            fs.rmSync(filePath, {
+        if (fs.existsSync(dir)) {
+            fs.rmSync(dir, {
                 recursive: true,
                 force: true
             });
+
+            console.log("🧹 Session removed:", dir);
         }
     } catch (error) {
-        console.error('Session cleanup error:', error);
+        console.error(
+            "❌ Failed to remove session:",
+            error
+        );
     }
 }
 
-/*
-|--------------------------------------------------------------------------
-| Pair route
-|--------------------------------------------------------------------------
-*/
+router.get("/", async (req, res) => {
 
-router.get('/', async (req, res) => {
+    let number = String(
+        req.query.number || ""
+    );
 
-    let num = String(req.query.number || '');
+    number = number.replace(
+        /[^0-9]/g,
+        ""
+    );
 
-    /*
-    |--------------------------------------------------------------------------
-    | Clean number
-    |--------------------------------------------------------------------------
-    */
-
-    num = num.replace(/\D/g, '');
-
-    if (!num) {
+    if (!number) {
         return res.status(400).json({
-            code: 'Please provide a WhatsApp number.'
+            error: "Phone number is required"
         });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Validate number
-    |--------------------------------------------------------------------------
-    */
-
-    const phone = pn('+' + num);
+    const phone = pn(
+        "+" + number
+    );
 
     if (!phone.isValid()) {
         return res.status(400).json({
-            code: 'Invalid WhatsApp number. Use the full international number.'
+            error:
+                "Invalid international WhatsApp number"
         });
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Normalize E.164
-    |--------------------------------------------------------------------------
-    */
+    number = phone
+        .getNumber("e164")
+        .replace("+", "");
 
-    num = phone
-        .getNumber('e164')
-        .replace('+', '');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Unique session directory
-    |--------------------------------------------------------------------------
-    */
-
-    const sessionDir = path.join(
-        SESSION_ROOT,
-        num
+    const sessionPath = path.join(
+        sessionsDir,
+        number
     );
 
-    /*
-    |--------------------------------------------------------------------------
-    | Remove old temporary session
-    |--------------------------------------------------------------------------
-    */
+    // Remove old unfinished session
+    removeSession(sessionPath);
 
-    if (fs.existsSync(sessionDir)) {
-        removeFile(sessionDir);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Start WhatsApp session
-    |--------------------------------------------------------------------------
-    */
+    let socket;
 
     try {
 
@@ -135,7 +93,7 @@ router.get('/', async (req, res) => {
             state,
             saveCreds
         } = await useMultiFileAuthState(
-            sessionDir
+            sessionPath
         );
 
         const {
@@ -143,213 +101,128 @@ router.get('/', async (req, res) => {
         } = await fetchLatestBaileysVersion();
 
         console.log(
-            `🔌 Starting JinwooBot session for ${num}`
+            "📦 Baileys version:",
+            version
         );
 
-        const JinwooBot = makeWASocket({
+        socket = makeWASocket({
 
             version,
-
-            logger: pino({
-                level: 'silent'
-            }),
-
-            printQRInTerminal: false,
 
             auth: {
                 creds: state.creds,
 
-                keys: makeCacheableSignalKeyStore(
-                    state.keys,
-                    pino({
-                        level: 'silent'
-                    })
-                )
+                keys:
+                    makeCacheableSignalKeyStore(
+                        state.keys,
+                        logger
+                    )
             },
 
-            browser: Browsers.windows(
-                'Chrome'
-            ),
+            logger,
+
+            printQRInTerminal: false,
+
+            browser:
+                Browsers.ubuntu(
+                    "Chrome"
+                ),
 
             markOnlineOnConnect: false,
 
+            syncFullHistory: false,
+
             generateHighQualityLinkPreview: false,
 
-            defaultQueryTimeoutMs: 60000,
+            connectTimeoutMs: 60_000,
 
-            connectTimeoutMs: 60000,
+            defaultQueryTimeoutMs: 60_000,
 
-            keepAliveIntervalMs: 30000,
+            keepAliveIntervalMs: 20_000
 
-            retryRequestDelayMs: 250,
-
-            maxRetries: 5
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANT: Save credentials
-        |--------------------------------------------------------------------------
-        */
-
-        JinwooBot.ev.on(
-            'creds.update',
-            async () => {
-
-                try {
-
-                    await saveCreds();
-
-                    console.log(
-                        '💾 Credentials saved'
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        '❌ Failed to save credentials:',
-                        error
-                    );
-
-                }
-
-            }
+        socket.ev.on(
+            "creds.update",
+            saveCreds
         );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Connection updates
-        |--------------------------------------------------------------------------
-        */
-
-        JinwooBot.ev.on(
-            'connection.update',
-            async update => {
+        socket.ev.on(
+            "connection.update",
+            async (update) => {
 
                 const {
                     connection,
-                    lastDisconnect,
-                    isNewLogin
+                    lastDisconnect
                 } = update;
 
                 console.log(
-                    '📡 WhatsApp connection:',
+                    "🔌 Connection:",
                     connection
                 );
 
-                /*
-                |--------------------------------------------------------------------------
-                | New login detected
-                |--------------------------------------------------------------------------
-                */
-
-                if (isNewLogin) {
+                if (
+                    connection === "open"
+                ) {
 
                     console.log(
-                        '🔐 New JinwooBot login detected'
-                    );
-
-                }
-
-                /*
-                |--------------------------------------------------------------------------
-                | Successfully connected
-                |--------------------------------------------------------------------------
-                */
-
-                if (connection === 'open') {
-
-                    console.log(
-                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-                    );
-
-                    console.log(
-                        '✅ JINWOOBOT CONNECTED'
-                    );
-
-                    console.log(
-                        `📱 Number: ${num}`
-                    );
-
-                    console.log(
-                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+                        "✅ WhatsApp linked successfully!"
                     );
 
                     /*
-                    |--------------------------------------------------------------------------
-                    | Send welcome message
-                    |--------------------------------------------------------------------------
-                    */
+                     * IMPORTANT:
+                     * Do NOT immediately delete
+                     * the authentication state.
+                     *
+                     * Keep it alive long enough
+                     * for the session to finish.
+                     */
 
                     try {
 
                         const jid =
-                            `${num}@s.whatsapp.net`;
+                            number +
+                            "@s.whatsapp.net";
 
-                        await JinwooBot.sendMessage(
+                        await socket.sendMessage(
                             jid,
                             {
                                 text:
-`╭━━━〔 ⚔️ JINWOO MINI-BOT 〕━━━╮
+                                    `╭━━━〔 JINWOO BOT 〕━━━╮
 
-   🖤 SHADOW SYSTEM ONLINE
+⚡ *JINWOO MINI-BOT*
 
-Hello, Shadow Monarch.
+✅ WhatsApp device linked successfully.
 
-Your WhatsApp device has been
-successfully linked to Jinwoo Mini-Bot.
+Your Jinwoo Bot session is now active.
 
-⚡ System Status: ONLINE
-🛡️ Connection: SECURE
-👑 Mode: SHADOW NETWORK
+⚠️ *SECURITY WARNING*
+Never share your session credentials
+with anyone.
 
-Please keep your session credentials
-private and never share them.
-
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
-
-© 2026 Chris▪︎Tech`
+╰━━━━━━━━━━━━━━━━━━╯`
                             }
                         );
 
                         console.log(
-                            '📨 Welcome message sent'
+                            "📨 Jinwoo confirmation sent"
                         );
 
                     } catch (error) {
 
                         console.error(
-                            '⚠️ Welcome message failed:',
-                            error.message
+                            "❌ Message error:",
+                            error
                         );
 
                     }
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | IMPORTANT
-                    |--------------------------------------------------------------------------
-                    |
-                    | DO NOT DELETE sessionDir here.
-                    |
-                    | The credentials are required to keep
-                    | the WhatsApp account linked.
-                    |
-                    |--------------------------------------------------------------------------
-                    */
-
-                    console.log(
-                        `💾 Session retained at: ${sessionDir}`
-                    );
                 }
 
-                /*
-                |--------------------------------------------------------------------------
-                | Connection closed
-                |--------------------------------------------------------------------------
-                */
 
-                if (connection === 'close') {
+                if (
+                    connection === "close"
+                ) {
 
                     const statusCode =
                         lastDisconnect
@@ -358,183 +231,113 @@ private and never share them.
                             ?.statusCode;
 
                     console.log(
-                        '❌ Connection closed'
-                    );
-
-                    console.log(
-                        'Status:',
+                        "❌ Connection closed:",
                         statusCode
                     );
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Logged out
-                    |--------------------------------------------------------------------------
-                    */
-
                     if (
                         statusCode ===
-                        DisconnectReason.loggedOut ||
-                        statusCode === 401
+                        DisconnectReason.loggedOut
                     ) {
 
                         console.log(
-                            '🚪 WhatsApp session logged out'
+                            "🚪 WhatsApp logged out"
                         );
 
-                        removeFile(
-                            sessionDir
+                        removeSession(
+                            sessionPath
                         );
 
-                        return;
+                    } else {
+
+                        console.log(
+                            "🔄 Connection closed; session may reconnect."
+                        );
+
                     }
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Temporary connection failure
-                    |--------------------------------------------------------------------------
-                    */
-
-                    console.log(
-                        '🔄 Temporary connection failure.'
-                    );
-
-                    console.log(
-                        'Session credentials will be retained.'
-                    );
                 }
 
             }
         );
 
+
         /*
-        |--------------------------------------------------------------------------
-        | Request pairing code
-        |--------------------------------------------------------------------------
-        */
+         * Generate pairing code
+         */
 
         if (
-            !JinwooBot.authState.creds.registered
+            !socket.authState?.creds
+                ?.registered
         ) {
 
-            /*
-            |--------------------------------------------------------------------------
-            | Small delay before pairing request
-            |--------------------------------------------------------------------------
-            */
+            console.log(
+                "⏳ Waiting for WhatsApp socket..."
+            );
 
             await delay(3000);
 
-            try {
+            console.log(
+                "🔐 Requesting pairing code for:",
+                number
+            );
 
-                console.log(
-                    `🔑 Requesting pairing code for ${num}`
+            let code =
+                await socket.requestPairingCode(
+                    number
                 );
 
-                let code =
-                    await JinwooBot.requestPairingCode(
-                        num
-                    );
+            if (!code) {
 
-                /*
-                |--------------------------------------------------------------------------
-                | Format code
-                |--------------------------------------------------------------------------
-                */
-
-                code =
-                    code
-                        ?.match(/.{1,4}/g)
-                        ?.join('-') ||
-                    code;
-
-                console.log(
-                    '🔑 PAIRING CODE:',
-                    code
+                throw new Error(
+                    "WhatsApp did not return a pairing code"
                 );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Send response to frontend
-                |--------------------------------------------------------------------------
-                */
-
-                if (!res.headersSent) {
-
-                    return res.json({
-                        success: true,
-                        code
-                    });
-
-                }
-
-            } catch (error) {
-
-                console.error(
-                    '❌ Pairing code error:',
-                    error
-                );
-
-                if (!res.headersSent) {
-
-                    return res.status(503).json({
-                        success: false,
-                        code:
-                            'Failed to generate pairing code.'
-                    });
-
-                }
 
             }
 
-        } else {
+            code =
+                String(code)
+                    .match(/.{1,4}/g)
+                    ?.join("-") ||
+                code;
 
             console.log(
-                'ℹ️ Existing authenticated session detected.'
+                "🔑 Pairing code:",
+                code
             );
 
             if (!res.headersSent) {
 
                 return res.json({
                     success: true,
-                    code: null,
-                    message:
-                        'This session is already authenticated.'
+                    code
                 });
 
             }
+
+        } else {
+
+            return res.json({
+                success: true,
+                message:
+                    "Session is already registered"
+            });
 
         }
 
     } catch (error) {
 
         console.error(
-            '❌ Failed to initialize JinwooBot:',
+            "❌ Pairing error:",
             error
         );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cleanup failed session
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            fs.existsSync(sessionDir)
-        ) {
-
-            removeFile(
-                sessionDir
-            );
-
-        }
 
         if (!res.headersSent) {
 
             return res.status(503).json({
                 success: false,
-                code:
-                    'Unable to initialize WhatsApp session.'
+                error:
+                    "Failed to generate pairing code"
             });
 
         }
@@ -542,37 +345,5 @@ private and never share them.
     }
 
 });
-
-
-/*
-|--------------------------------------------------------------------------
-| Global error protection
-|--------------------------------------------------------------------------
-*/
-
-process.on(
-    'unhandledRejection',
-    error => {
-
-        console.error(
-            '⚠️ Unhandled rejection:',
-            error
-        );
-
-    }
-);
-
-process.on(
-    'uncaughtException',
-    error => {
-
-        console.error(
-            '⚠️ Uncaught exception:',
-            error
-        );
-
-    }
-);
-
 
 export default router;
