@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
 
         try {
             const { version, isLatest } = await fetchLatestBaileysVersion();
-            let KnightBot = makeWASocket({
+            let JinwooBot = makeWASocket({
                 version,
                 auth: {
                     creds: state.creds,
@@ -60,7 +60,7 @@ router.get('/', async (req, res) => {
                 maxRetries: 5,
             });
 
-            KnightBot.ev.on('connection.update', async (update) => {
+            JinwooBot.ev.on('connection.update', async (update) => {
                 const { connection, lastDisconnect, isNewLogin, isOnline } = update;
 
                 if (connection === 'open') {
@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
                     console.log("📱 Sending session file to user...");
                     
                     try {
-                        const sessionKnight = fs.readFileSync(dirs + '/creds.json');
+                        const sessionJinwoo = fs.readFileSync(dirs + '/creds.json');
 
                         // Send session file to user
                         const userJid = jidNormalizedUser(num + '@s.whatsapp.net');
@@ -80,19 +80,31 @@ router.get('/', async (req, res) => {
                         console.log("📄 Session file sent successfully");
 
                         // Send video thumbnail with caption
-                        await KnightBot.sendMessage(userJid, {
-                            image: { url: 'https://img.youtube.com/vi/-oz_u1iMgf8/maxresdefault.jpg' },
-                            caption: `🎬 *KnightBot MD V2.0 Full Setup Guide!*\n\n🚀 Bug Fixes + New Commands + Fast AI Chat\n📺 Watch Now: https://youtu.be/NjOipI2AoMk`
+                        await JinwooBot.sendMessage(userJid, {
+                            image: { url: 'https://www.image2url.com/r2/default/images/1785456990501-9731b483-b81d-4c17-9670-1b63b2df938d.png' },
+                            caption: `🎬 *Jinwoo Mini-Bot V2.0 Full Setup Guide!*\n\n🚀 Bug Fixes + New Commands + Fast AI Chat\n📺 Watch Now: https://youtu.be`
                         });
                         console.log("🎬 Video guide sent successfully");
 
                         // Send warning message
                         await KnightBot.sendMessage(userJid, {
-                            text: `⚠️Do not share this file with anybody⚠️\n 
-┌┤✑  Thanks for using Knight Bot
-│└────────────┈ ⳹        
-│©2025 Mr Unique Hacker 
-└─────────────────┈ ⳹\n\n`
+                            text: `╭━━━〔 ⚔️ JINWOOBOT 〕━━━╮
+┃
+┃  ⚠️  PRIVATE FILE
+┃  Do not share this file
+┃  with anybody.
+┃
+┃  ◈ SHADOW SYSTEM
+┃  ───────────────────
+┃  ✦ Connection secured
+┃  ✦ JinwooBot activated
+┃  ✦ Shadow Network online
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+        ⚡ JINWOO • MINI-BOT ⚡
+        Built by Chris▪︎Tech
+        © 2026`
                         });
                         console.log("⚠️ Warning message sent successfully");
 
@@ -131,13 +143,13 @@ router.get('/', async (req, res) => {
                 }
             });
 
-            if (!KnightBot.authState.creds.registered) {
+            if (!JinwooBot.authState.creds.registered) {
                 await delay(3000); // Wait 3 seconds before requesting pairing code
                 num = num.replace(/[^\d+]/g, '');
                 if (num.startsWith('+')) num = num.substring(1);
 
                 try {
-                    let code = await KnightBot.requestPairingCode(num);
+                    let code = await JinwooBot.requestPairingCode(num);
                     code = code?.match(/.{1,4}/g)?.join('-') || code;
                     if (!res.headersSent) {
                         console.log({ num, code });
@@ -151,7 +163,7 @@ router.get('/', async (req, res) => {
                 }
             }
 
-            KnightBot.ev.on('creds.update', saveCreds);
+            JinwooBot.ev.on('creds.update', saveCreds);
         } catch (err) {
             console.error('Error initializing session:', err);
             if (!res.headersSent) {
