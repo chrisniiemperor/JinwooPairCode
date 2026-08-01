@@ -1,0 +1,3051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<meta name="theme-color" content="#03060d">
+
+<title>Jinwoo Mini-Bot — Pair Device</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap"
+rel="stylesheet">
+
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<style>
+
+/* =========================================================
+   JINWOO MINI-BOT
+   GLASSMORPHIC ANIMATED UI
+========================================================= */
+
+:root {
+    --bg:#02050b;
+    --text:#edf8ff;
+    --muted:#91a5ba;
+
+    --primary:#00b7ff;
+    --cyan:#00e5ff;
+    --violet:#814cff;
+
+    --success:#00e6a0;
+    --danger:#ff5270;
+
+    --glass:rgba(5,13,25,.58);
+    --glass-strong:rgba(6,15,28,.72);
+
+    --border:rgba(150,220,255,.16);
+
+    --shadow:
+        0 30px 100px rgba(0,0,0,.65);
+
+    --input-bg:rgba(0,0,0,.28);
+}
+
+
+/* =========================================================
+   LIGHT MODE
+========================================================= */
+
+body.light {
+
+    --bg:#edf5fb;
+
+    --text:#071522;
+
+    --muted:#566d81;
+
+    --glass:rgba(255,255,255,.66);
+
+    --glass-strong:rgba(255,255,255,.78);
+
+    --border:rgba(25,95,135,.16);
+
+    --shadow:
+        0 30px 80px rgba(30,70,100,.20);
+
+    --input-bg:rgba(255,255,255,.55);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+
+html {
+    scroll-behavior:smooth;
+}
+
+
+body {
+
+    min-height:100vh;
+
+    font-family:"Inter",sans-serif;
+
+    color:var(--text);
+
+    background:var(--bg);
+
+    overflow-x:hidden;
+
+    transition:
+        background .6s ease,
+        color .45s ease;
+
+}
+
+
+/* =========================================================
+   STATIC JINWOO VIDEO BACKGROUND
+   NO VIDEO ANIMATION
+========================================================= */
+
+#bgVideo {
+
+    position:fixed;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    z-index:-5;
+
+    pointer-events:none;
+
+}
+
+
+/* Dark cinematic overlay */
+
+.video-overlay {
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:-4;
+
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(2,6,15,.72),
+            rgba(2,6,15,.78)
+        );
+
+    transition:
+        background .5s ease;
+
+}
+
+
+body.light .video-overlay {
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(235,245,252,.78),
+            rgba(235,245,252,.82)
+        );
+
+}
+
+
+/* =========================================================
+   AMBIENT LIGHT
+========================================================= */
+
+.ambient {
+
+    position:fixed;
+
+    width:420px;
+    height:420px;
+
+    border-radius:50%;
+
+    pointer-events:none;
+
+    filter:blur(60px);
+
+    opacity:.22;
+
+    background:
+        radial-gradient(
+            circle,
+            var(--primary),
+            transparent 70%
+        );
+
+    animation:
+        ambientFloat 7s ease-in-out infinite;
+
+}
+
+
+.ambient.one {
+    top:-180px;
+    right:-120px;
+}
+
+
+.ambient.two {
+
+    bottom:-220px;
+    left:-150px;
+
+    background:
+        radial-gradient(
+            circle,
+            var(--violet),
+            transparent 70%
+        );
+
+    animation-delay:-3s;
+
+}
+
+
+@keyframes ambientFloat {
+
+    0%,100% {
+        transform:translate(0,0);
+    }
+
+    50% {
+        transform:translate(20px,-15px);
+    }
+
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+body::before {
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:-2;
+
+    opacity:.35;
+
+    background-image:
+
+        linear-gradient(
+            rgba(0,210,255,.035) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(0,210,255,.035) 1px,
+            transparent 1px
+        );
+
+    background-size:42px 42px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent
+        );
+
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.page {
+
+    width:min(
+        1180px,
+        calc(100% - 28px)
+    );
+
+    min-height:100vh;
+
+    margin:auto;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+nav {
+
+    height:80px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    animation:
+        navEnter .7s ease both;
+
+}
+
+
+@keyframes navEnter {
+
+    from {
+        opacity:0;
+        transform:translateY(-15px);
+    }
+
+    to {
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.logo {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+
+.logo-icon {
+
+    position:relative;
+
+    width:43px;
+    height:43px;
+
+    display:grid;
+
+    place-items:center;
+
+    border-radius:13px;
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--violet)
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(0,180,255,.35);
+
+    animation:
+        logoPulse 2.8s ease-in-out infinite;
+
+}
+
+
+.logo-icon::before {
+
+    content:"";
+
+    position:absolute;
+
+    inset:-5px;
+
+    border:
+        1px solid
+        rgba(0,200,255,.45);
+
+    border-radius:16px;
+
+    animation:
+        energyRing 2.5s linear infinite;
+
+}
+
+
+@keyframes logoPulse {
+
+    0%,100% {
+        box-shadow:
+            0 0 20px
+            rgba(0,180,255,.25);
+    }
+
+    50% {
+        box-shadow:
+            0 0 38px
+            rgba(0,210,255,.55);
+    }
+
+}
+
+
+@keyframes energyRing {
+
+    0% {
+        transform:scale(.92);
+        opacity:.8;
+    }
+
+    70% {
+        transform:scale(1.18);
+        opacity:0;
+    }
+
+    100% {
+        transform:scale(1.18);
+        opacity:0;
+    }
+
+}
+
+
+.logo-name {
+
+    font-family:"Orbitron",sans-serif;
+
+    font-size:12px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+
+}
+
+
+.logo-name span {
+
+    color:var(--primary);
+
+}
+
+
+/* =========================================================
+   NAV BUTTONS
+========================================================= */
+
+.nav-actions {
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+
+.nav-btn {
+
+    position:relative;
+
+    width:41px;
+    height:41px;
+
+    display:grid;
+
+    place-items:center;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:12px;
+
+    background:
+        var(--glass);
+
+    backdrop-filter:blur(18px);
+
+    color:var(--muted);
+
+    cursor:pointer;
+
+    transition:
+        .3s ease;
+
+}
+
+
+.nav-btn:hover {
+
+    color:var(--cyan);
+
+    border-color:
+        rgba(0,210,255,.45);
+
+    transform:
+        translateY(-2px);
+
+}
+
+
+/* =========================================================
+   MUSIC ANIMATION
+========================================================= */
+
+#music.music-on {
+
+    color:var(--cyan);
+
+    border-color:
+        rgba(0,210,255,.5);
+
+    box-shadow:
+        0 0 22px
+        rgba(0,190,255,.2);
+
+}
+
+
+#music.music-on i {
+
+    animation:
+        speakerPulse 1s ease-in-out infinite;
+
+}
+
+
+#music.music-on::before,
+#music.music-on::after {
+
+    content:"";
+
+    position:absolute;
+
+    border:1px solid
+        rgba(0,210,255,.35);
+
+    border-radius:50%;
+
+    animation:
+        soundWave 1.5s ease-out infinite;
+
+}
+
+
+#music.music-on::after {
+
+    animation-delay:.5s;
+
+}
+
+
+@keyframes speakerPulse {
+
+    0%,100% {
+        transform:scale(1);
+    }
+
+    50% {
+        transform:scale(1.18);
+    }
+
+}
+
+
+@keyframes soundWave {
+
+    0% {
+        width:20px;
+        height:20px;
+        opacity:.7;
+    }
+
+    100% {
+        width:50px;
+        height:50px;
+        opacity:0;
+    }
+
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main {
+
+    flex:1;
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 450px;
+
+    gap:65px;
+
+    align-items:center;
+
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+
+    padding:35px 0;
+
+    animation:
+        heroEnter .9s .15s ease both;
+
+}
+
+
+@keyframes heroEnter {
+
+    from {
+        opacity:0;
+        transform:translateY(25px);
+    }
+
+    to {
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+
+/* =========================================================
+   ONLINE BADGE
+========================================================= */
+
+.badge {
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    padding:8px 13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:50px;
+
+    background:
+        var(--glass);
+
+    backdrop-filter:blur(16px);
+
+    color:var(--muted);
+
+    font-size:10px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+}
+
+
+.dot {
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    background:var(--success);
+
+    box-shadow:
+        0 0 12px
+        var(--success);
+
+    animation:
+        statusPulse 1.6s ease-in-out infinite;
+
+}
+
+
+@keyframes statusPulse {
+
+    0%,100% {
+        transform:scale(1);
+        opacity:1;
+    }
+
+    50% {
+        transform:scale(1.5);
+        opacity:.55;
+    }
+
+}
+
+
+/* =========================================================
+   HEADING
+========================================================= */
+
+h1 {
+
+    margin-top:25px;
+
+    font-family:"Orbitron",sans-serif;
+
+    font-size:
+        clamp(
+            45px,
+            7vw,
+            78px
+        );
+
+    line-height:.98;
+
+    letter-spacing:-3px;
+
+}
+
+
+h1 span {
+
+    display:block;
+
+}
+
+
+.hollow {
+
+    color:transparent;
+
+    -webkit-text-stroke:
+        1px var(--text);
+
+    animation:
+        textReveal .8s .3s ease both;
+
+}
+
+
+.gradient {
+
+    color:transparent;
+
+    background:
+        linear-gradient(
+            100deg,
+            var(--primary),
+            var(--cyan),
+            var(--violet),
+            var(--primary)
+        );
+
+    background-size:300% 100%;
+
+    -webkit-background-clip:text;
+
+    background-clip:text;
+
+    animation:
+        textReveal .9s .45s ease both,
+        gradientShimmer 4s linear infinite;
+
+}
+
+
+@keyframes textReveal {
+
+    from {
+        opacity:0;
+        transform:translateX(-20px);
+    }
+
+    to {
+        opacity:1;
+        transform:translateX(0);
+    }
+
+}
+
+
+@keyframes gradientShimmer {
+
+    0% {
+        background-position:0% 50%;
+    }
+
+    100% {
+        background-position:300% 50%;
+    }
+
+}
+
+
+/* =========================================================
+   HERO TEXT
+========================================================= */
+
+.hero p {
+
+    max-width:560px;
+
+    margin-top:24px;
+
+    color:var(--muted);
+
+    line-height:1.8;
+
+    font-size:14px;
+
+}
+
+
+.hero p strong {
+
+    color:var(--text);
+
+}
+
+
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.features {
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin-top:25px;
+
+}
+
+
+.feature {
+
+    padding:9px 12px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:10px;
+
+    background:
+        var(--glass);
+
+    backdrop-filter:blur(12px);
+
+    color:var(--muted);
+
+    font-size:10px;
+
+    transition:.3s ease;
+
+}
+
+
+.feature:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        rgba(0,190,255,.35);
+
+    color:var(--text);
+
+}
+
+
+.feature i {
+
+    margin-right:6px;
+
+    color:var(--primary);
+
+}
+
+
+/* =========================================================
+   GLASS CARD
+========================================================= */
+
+.card {
+
+    position:relative;
+
+    padding:27px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:25px;
+
+    background:
+        var(--glass-strong);
+
+    backdrop-filter:
+        blur(28px)
+        saturate(150%);
+
+    -webkit-backdrop-filter:
+        blur(28px)
+        saturate(150%);
+
+    box-shadow:
+        var(--shadow);
+
+    overflow:hidden;
+
+    animation:
+        cardEnter .9s .2s ease both,
+        cardFloat 6s 1.2s ease-in-out infinite;
+
+}
+
+
+@keyframes cardEnter {
+
+    from {
+        opacity:0;
+        transform:
+            translateY(35px)
+            scale(.97);
+    }
+
+    to {
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+
+}
+
+
+@keyframes cardFloat {
+
+    0%,100% {
+        transform:translateY(0);
+    }
+
+    50% {
+        transform:translateY(-5px);
+    }
+
+}
+
+
+/* Glass shine */
+
+.card::after {
+
+    content:"";
+
+    position:absolute;
+
+    top:-120%;
+
+    left:-60%;
+
+    width:45%;
+
+    height:300%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.08),
+            transparent
+        );
+
+    transform:
+        rotate(20deg);
+
+    pointer-events:none;
+
+    animation:
+        glassShine 7s ease-in-out infinite;
+
+}
+
+
+@keyframes glassShine {
+
+    0%,65% {
+        left:-70%;
+    }
+
+    85%,100% {
+        left:140%;
+    }
+
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-head {
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    margin-bottom:22px;
+
+}
+
+
+.card-title {
+
+    font-family:"Orbitron",sans-serif;
+
+    font-size:16px;
+
+    font-weight:700;
+
+}
+
+
+.card-sub {
+
+    margin-top:5px;
+
+    color:var(--muted);
+
+    font-size:10px;
+
+}
+
+
+.icon {
+
+    width:43px;
+    height:43px;
+
+    display:grid;
+
+    place-items:center;
+
+    border:
+        1px solid
+        rgba(0,190,255,.25);
+
+    border-radius:13px;
+
+    color:var(--primary);
+
+    background:
+        rgba(0,180,255,.06);
+
+    animation:
+        iconGlow 2.5s ease-in-out infinite;
+
+}
+
+
+@keyframes iconGlow {
+
+    0%,100% {
+        box-shadow:0 0 0 transparent;
+    }
+
+    50% {
+        box-shadow:
+            0 0 22px
+            rgba(0,190,255,.18);
+    }
+
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.label {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:8px;
+
+    color:var(--muted);
+
+    font-size:10px;
+
+    font-weight:700;
+
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.input-box {
+
+    position:relative;
+
+}
+
+
+.input-box i {
+
+    position:absolute;
+
+    left:14px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:var(--primary);
+
+    pointer-events:none;
+
+    transition:.3s ease;
+
+}
+
+
+.input-box:focus-within i {
+
+    transform:
+        translateY(-50%)
+        scale(1.15);
+
+    color:var(--cyan);
+
+    filter:
+        drop-shadow(
+            0 0 6px
+            var(--cyan)
+        );
+
+}
+
+
+input {
+
+    width:100%;
+
+    padding:
+        15px
+        14px
+        15px
+        42px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:13px;
+
+    outline:none;
+
+    background:
+        var(--input-bg);
+
+    backdrop-filter:blur(10px);
+
+    color:var(--text);
+
+    font-size:13px;
+
+    transition:
+        .3s ease;
+
+}
+
+
+input::placeholder {
+
+    color:var(--muted);
+
+}
+
+
+input:focus {
+
+    border-color:
+        var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0,180,255,.08),
+        0 0 22px
+        rgba(0,180,255,.12);
+
+}
+
+
+/* =========================================================
+   GENERATE BUTTON
+========================================================= */
+
+.generate {
+
+    position:relative;
+
+    overflow:hidden;
+
+    width:100%;
+
+    margin-top:14px;
+
+    padding:15px;
+
+    border:0;
+
+    border-radius:13px;
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            100deg,
+            #087cff,
+            #00bfff,
+            #7047ff,
+            #087cff
+        );
+
+    background-size:
+        300% 100%;
+
+    font-size:11px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    animation:
+        buttonGradient 4s linear infinite;
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease;
+
+}
+
+
+@keyframes buttonGradient {
+
+    0% {
+        background-position:0% 50%;
+    }
+
+    100% {
+        background-position:300% 50%;
+    }
+
+}
+
+
+.generate::before {
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-100%;
+
+    width:70%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.3),
+            transparent
+        );
+
+    transform:
+        skewX(-20deg);
+
+    animation:
+        buttonShine 3s ease-in-out infinite;
+
+}
+
+
+@keyframes buttonShine {
+
+    0%,55% {
+        left:-100%;
+    }
+
+    80%,100% {
+        left:140%;
+    }
+
+}
+
+
+.generate:hover {
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 12px 30px
+        rgba(0,150,255,.25);
+
+}
+
+
+.generate:active {
+
+    transform:
+        scale(.98);
+
+}
+
+
+.generate:disabled {
+
+    opacity:.55;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading {
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    margin-top:13px;
+
+    color:var(--primary);
+
+    font-size:10px;
+
+}
+
+
+.loading.show {
+
+    display:flex;
+
+    animation:
+        fadeIn .3s ease;
+
+}
+
+
+.spinner {
+
+    width:15px;
+    height:15px;
+
+    border:
+        2px solid
+        rgba(0,180,255,.15);
+
+    border-top-color:
+        var(--primary);
+
+    border-radius:50%;
+
+    animation:
+        spin .7s linear infinite;
+
+}
+
+
+@keyframes spin {
+
+    to {
+        transform:rotate(360deg);
+    }
+
+}
+
+
+@keyframes fadeIn {
+
+    from {
+        opacity:0;
+    }
+
+    to {
+        opacity:1;
+    }
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status {
+
+    min-height:85px;
+
+    margin-top:14px;
+
+    padding:15px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:14px;
+
+    color:var(--muted);
+
+    font-family:monospace;
+
+    font-size:10px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    transition:.3s ease;
+
+}
+
+
+.status.success {
+
+    color:var(--success);
+
+    border-color:
+        rgba(0,230,160,.3);
+
+    background:
+        rgba(0,230,160,.05);
+
+    animation:
+        resultReveal .6s ease both;
+
+}
+
+
+.status.error {
+
+    color:var(--danger);
+
+    border-color:
+        rgba(255,82,112,.3);
+
+    animation:
+        shake .35s ease;
+
+}
+
+
+@keyframes resultReveal {
+
+    from {
+
+        opacity:0;
+
+        transform:
+            scale(.94)
+            translateY(8px);
+
+    }
+
+    to {
+
+        opacity:1;
+
+        transform:
+            scale(1)
+            translateY(0);
+
+    }
+
+}
+
+
+@keyframes shake {
+
+    0%,100% {
+        transform:translateX(0);
+    }
+
+    25% {
+        transform:translateX(-5px);
+    }
+
+    75% {
+        transform:translateX(5px);
+    }
+
+}
+
+
+/* =========================================================
+   CODE
+========================================================= */
+
+.code-label {
+
+    color:var(--muted);
+
+    font-size:8px;
+
+    letter-spacing:2px;
+
+}
+
+
+.code {
+
+    margin-top:5px;
+
+    font-family:"Orbitron",sans-serif;
+
+    font-size:24px;
+
+    font-weight:800;
+
+    letter-spacing:4px;
+
+    color:var(--primary);
+
+    text-shadow:
+        0 0 10px
+        rgba(0,180,255,.35);
+
+    animation:
+        codeGlow 1.8s ease-in-out infinite;
+
+}
+
+
+@keyframes codeGlow {
+
+    0%,100% {
+
+        text-shadow:
+            0 0 10px
+            rgba(0,180,255,.25);
+
+    }
+
+    50% {
+
+        text-shadow:
+            0 0 28px
+            rgba(0,220,255,.75);
+
+    }
+
+}
+
+
+/* =========================================================
+   COPY BUTTON
+========================================================= */
+
+.copy {
+
+    display:none;
+
+    width:100%;
+
+    margin-top:9px;
+
+    padding:11px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:11px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    color:var(--muted);
+
+    cursor:pointer;
+
+    font-size:10px;
+
+    transition:.25s ease;
+
+}
+
+
+.copy.show {
+
+    display:block;
+
+    animation:
+        copyReveal .4s ease both;
+
+}
+
+
+@keyframes copyReveal {
+
+    from {
+        opacity:0;
+        transform:translateY(5px);
+    }
+
+    to {
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+
+.copy:hover {
+
+    color:var(--primary);
+
+    border-color:
+        rgba(0,190,255,.35);
+
+}
+
+
+.copy.copied {
+
+    color:var(--success);
+
+    border-color:
+        rgba(0,230,160,.4);
+
+    animation:
+        copiedPulse .45s ease;
+
+}
+
+
+@keyframes copiedPulse {
+
+    50% {
+        transform:scale(1.03);
+        box-shadow:
+            0 0 20px
+            rgba(0,230,160,.15);
+    }
+
+}
+
+
+/* =========================================================
+   INSTRUCTIONS
+========================================================= */
+
+.instructions {
+
+    margin-top:15px;
+
+    padding:13px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:12px;
+
+    color:var(--muted);
+
+    font-size:10px;
+
+    line-height:1.7;
+
+    background:
+        rgba(255,255,255,.018);
+
+}
+
+
+.instructions strong {
+
+    color:var(--text);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+
+    padding:18px 0;
+
+    margin-top:25px;
+
+    border-top:
+        1px solid var(--border);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    color:var(--muted);
+
+    font-size:9px;
+
+    animation:
+        fadeIn 1s .8s ease both;
+
+}
+
+
+footer strong {
+
+    color:var(--primary);
+
+}
+
+
+/* =========================================================
+   THEME TRANSITION
+========================================================= */
+
+body.theme-changing * {
+
+    transition:
+        background .45s ease,
+        color .45s ease,
+        border-color .45s ease,
+        box-shadow .45s ease;
+
+}
+
+
+#theme i {
+
+    transition:
+        transform .45s ease;
+
+}
+
+
+#theme.rotate i {
+
+    transform:
+        rotate(180deg)
+        scale(1.1);
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:900px) {
+
+    main {
+
+        grid-template-columns:1fr;
+
+        max-width:560px;
+
+        margin:
+            35px auto;
+
+        gap:25px;
+
+    }
+
+
+    .hero {
+
+        text-align:center;
+
+    }
+
+
+    .hero p {
+
+        margin-left:auto;
+        margin-right:auto;
+
+    }
+
+
+    .features {
+
+        justify-content:center;
+
+    }
+
+}
+
+
+@media(max-width:560px) {
+
+    .page {
+
+        width:
+            calc(100% - 22px);
+
+    }
+
+
+    nav {
+
+        height:70px;
+
+    }
+
+
+    .logo-icon {
+
+        width:38px;
+        height:38px;
+
+    }
+
+
+    .logo-name {
+
+        font-size:10px;
+
+    }
+
+
+    .nav-btn {
+
+        width:38px;
+        height:38px;
+
+    }
+
+
+    h1 {
+
+        font-size:44px;
+
+        letter-spacing:-2px;
+
+    }
+
+
+    .card {
+
+        padding:20px;
+
+        border-radius:20px;
+
+    }
+
+
+    footer {
+
+        flex-direction:column;
+
+        gap:10px;
+
+        text-align:center;
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:.01ms !important;
+
+        animation-iteration-count:1 !important;
+
+        scroll-behavior:auto !important;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     STATIC JINWOO VIDEO
+===================================================== -->
+
+<video
+    id="bgVideo"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+>
+
+    <source
+        src="./Jinwoo.mp4"
+        type="video/mp4"
+    >
+
+</video>
+
+
+<div class="video-overlay"></div>
+
+<div class="ambient one"></div>
+
+<div class="ambient two"></div>
+
+
+<div class="page">
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<nav>
+
+    <div class="logo">
+
+        <div class="logo-icon">
+
+            <i class="fas fa-bolt"></i>
+
+        </div>
+
+
+        <div class="logo-name">
+
+            JINWOO
+            <span>//</span>
+            MINI-BOT
+
+        </div>
+
+    </div>
+
+
+    <div class="nav-actions">
+
+
+        <!-- MUSIC -->
+
+        <button
+            class="nav-btn"
+            id="music"
+            type="button"
+            title="Music off"
+            aria-label="Turn music on"
+        >
+
+            <i class="fas fa-volume-xmark"></i>
+
+        </button>
+
+
+        <!-- THEME -->
+
+        <button
+            class="nav-btn"
+            id="theme"
+            type="button"
+            title="Theme"
+            aria-label="Toggle theme"
+        >
+
+            <i class="fas fa-sun"></i>
+
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+
+    <div class="badge">
+
+        <span class="dot"></span>
+
+        SHADOW NETWORK ONLINE
+
+    </div>
+
+
+    <h1>
+
+        <span class="hollow">
+
+            CONNECT
+
+        </span>
+
+
+        <span class="gradient">
+
+            JINWOO
+
+        </span>
+
+    </h1>
+
+
+    <p>
+
+        Connect your WhatsApp device to
+        <strong>Jinwoo Mini-Bot</strong>
+        using a secure pairing code.
+
+        <br><br>
+
+        Open WhatsApp and enter the code
+        generated by the Shadow Network.
+
+    </p>
+
+
+    <div class="features">
+
+        <div class="feature">
+
+            <i class="fas fa-bolt"></i>
+
+            Fast
+
+        </div>
+
+
+        <div class="feature">
+
+            <i class="fas fa-shield-halved"></i>
+
+            Secure
+
+        </div>
+
+
+        <div class="feature">
+
+            <i class="fas fa-mobile-screen"></i>
+
+            Mobile Ready
+
+        </div>
+
+
+        <div class="feature">
+
+            <i class="fas fa-server"></i>
+
+            Cloud Connected
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PAIRING CARD
+===================================================== -->
+
+<section class="card">
+
+
+    <div class="card-head">
+
+        <div>
+
+            <div class="card-title">
+
+                Link WhatsApp
+
+            </div>
+
+
+            <div class="card-sub">
+
+                Generate your secure pairing code
+
+            </div>
+
+        </div>
+
+
+        <div class="icon">
+
+            <i class="fas fa-fingerprint"></i>
+
+        </div>
+
+    </div>
+
+
+    <label
+        class="label"
+        for="number"
+    >
+
+        <span>
+
+            WhatsApp Number
+
+        </span>
+
+        <span>
+
+            International format
+
+        </span>
+
+    </label>
+
+
+    <div class="input-box">
+
+        <i class="fas fa-phone"></i>
+
+
+        <input
+            id="number"
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel"
+            placeholder="+233501234567"
+        >
+
+    </div>
+
+
+    <button
+        class="generate"
+        id="generate"
+        type="button"
+    >
+
+        <i class="fas fa-link"></i>
+
+        Generate Pair Code
+
+    </button>
+
+
+    <div
+        class="loading"
+        id="loading"
+    >
+
+        <span class="spinner"></span>
+
+        Connecting to WhatsApp...
+
+    </div>
+
+
+    <div
+        class="status"
+        id="status"
+    >
+
+        Your pairing code will appear here.
+
+    </div>
+
+
+    <button
+        class="copy"
+        id="copy"
+        type="button"
+    >
+
+        <i class="fas fa-copy"></i>
+
+        Copy Pair Code
+
+    </button>
+
+
+    <div class="instructions">
+
+        <strong>
+            How to link:
+        </strong>
+
+        <br>
+
+        1. Open WhatsApp.
+
+        <br>
+
+        2. Go to
+        <strong>
+            Settings → Linked Devices
+        </strong>.
+
+        <br>
+
+        3. Select
+        <strong>
+            Link a device
+        </strong>.
+
+        <br>
+
+        4. Choose
+        <strong>
+            Link with phone number
+        </strong>.
+
+        <br>
+
+        5. Enter the Jinwoo pairing code.
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <div>
+
+        © 2026
+        <strong>Chris▪︎Tech</strong>
+        · Jinwoo Mini-Bot
+
+    </div>
+
+
+    <div>
+
+        SHADOW NODE JW-01
+
+    </div>
+
+</footer>
+
+
+</div>
+
+
+<!-- =====================================================
+     MUSIC
+===================================================== -->
+
+<audio
+    id="audio"
+    src="./Music.mp3"
+    loop
+    preload="auto"
+></audio>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const numberInput =
+    document.getElementById("number");
+
+const generate =
+    document.getElementById("generate");
+
+const loading =
+    document.getElementById("loading");
+
+const status =
+    document.getElementById("status");
+
+const copy =
+    document.getElementById("copy");
+
+const theme =
+    document.getElementById("theme");
+
+const musicButton =
+    document.getElementById("music");
+
+const audio =
+    document.getElementById("audio");
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let currentCode = "";
+
+let currentNumber = "";
+
+let statusTimer = null;
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+const savedTheme =
+    localStorage.getItem("jinwoo-theme");
+
+
+if(savedTheme === "light") {
+
+    document.body.classList.add("light");
+
+    theme.innerHTML =
+        '<i class="fas fa-moon"></i>';
+
+} else {
+
+    theme.innerHTML =
+        '<i class="fas fa-sun"></i>';
+
+}
+
+
+theme.addEventListener(
+    "click",
+    () => {
+
+        document.body.classList.add(
+            "theme-changing"
+        );
+
+        theme.classList.add("rotate");
+
+
+        setTimeout(() => {
+
+            const light =
+                document.body.classList.toggle(
+                    "light"
+                );
+
+
+            localStorage.setItem(
+                "jinwoo-theme",
+                light
+                    ? "light"
+                    : "dark"
+            );
+
+
+            theme.innerHTML =
+                light
+                    ? '<i class="fas fa-moon"></i>'
+                    : '<i class="fas fa-sun"></i>';
+
+        },100);
+
+
+        setTimeout(() => {
+
+            theme.classList.remove(
+                "rotate"
+            );
+
+            document.body.classList.remove(
+                "theme-changing"
+            );
+
+        },550);
+
+    }
+);
+
+
+/* =========================================================
+   MUSIC
+========================================================= */
+
+function updateMusicButton() {
+
+    if(!audio.paused) {
+
+        musicButton.classList.add(
+            "music-on"
+        );
+
+        musicButton.innerHTML =
+            '<i class="fas fa-volume-high"></i>';
+
+        musicButton.title =
+            "Music on";
+
+        musicButton.setAttribute(
+            "aria-label",
+            "Turn music off"
+        );
+
+    } else {
+
+        musicButton.classList.remove(
+            "music-on"
+        );
+
+        musicButton.innerHTML =
+            '<i class="fas fa-volume-xmark"></i>';
+
+        musicButton.title =
+            "Music off";
+
+        musicButton.setAttribute(
+            "aria-label",
+            "Turn music on"
+        );
+
+    }
+
+}
+
+
+async function enableMusic() {
+
+    try {
+
+        await audio.play();
+
+        localStorage.setItem(
+            "jinwoo-music",
+            "true"
+        );
+
+        updateMusicButton();
+
+    } catch(error) {
+
+        console.log(
+            "Music playback blocked:",
+            error
+        );
+
+    }
+
+}
+
+
+function disableMusic() {
+
+    audio.pause();
+
+    localStorage.setItem(
+        "jinwoo-music",
+        "false"
+    );
+
+    updateMusicButton();
+
+}
+
+
+musicButton.addEventListener(
+    "click",
+    async () => {
+
+        if(audio.paused) {
+
+            await enableMusic();
+
+        } else {
+
+            disableMusic();
+
+        }
+
+    }
+);
+
+
+audio.addEventListener(
+    "play",
+    updateMusicButton
+);
+
+
+audio.addEventListener(
+    "pause",
+    updateMusicButton
+);
+
+
+updateMusicButton();
+
+
+/* =========================================================
+   PAIRING
+========================================================= */
+
+generate.addEventListener(
+    "click",
+    generateCode
+);
+
+
+numberInput.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Enter") {
+
+            event.preventDefault();
+
+            generateCode();
+
+        }
+
+    }
+);
+
+
+async function generateCode() {
+
+    let number =
+        numberInput.value
+        .trim()
+        .replace(/\D/g,"");
+
+
+    if(number.length < 8) {
+
+        showError(
+            "Enter a valid international WhatsApp number."
+        );
+
+        return;
+
+    }
+
+
+    currentNumber =
+        number;
+
+
+    generate.disabled =
+        true;
+
+
+    loading.classList.add(
+        "show"
+    );
+
+
+    copy.classList.remove(
+        "show"
+    );
+
+
+    currentCode =
+        "";
+
+
+    status.className =
+        "status";
+
+
+    status.innerHTML =
+        "Initializing Shadow Network...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/pair?number=${encodeURIComponent(number)}`
+            );
+
+
+        let data;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch {
+
+            throw new Error(
+                "Invalid response from pairing server."
+            );
+
+        }
+
+
+        if(
+            !response.ok ||
+            data.success === false
+        ) {
+
+            throw new Error(
+                data.error ||
+                data.message ||
+                "Pairing service unavailable."
+            );
+
+        }
+
+
+        if(data.registered) {
+
+            status.className =
+                "status success";
+
+
+            status.innerHTML = `
+
+                <div>
+
+                    <div style="
+                        font-size:20px;
+                        margin-bottom:6px;
+                    ">
+
+                        ✓
+
+                    </div>
+
+                    This WhatsApp number is already linked.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        if(!data.code) {
+
+            throw new Error(
+                "WhatsApp did not return a pairing code."
+            );
+
+        }
+
+
+        currentCode =
+            String(data.code);
+
+
+        status.className =
+            "status success";
+
+
+        status.innerHTML = `
+
+            <div>
+
+                <div class="code-label">
+
+                    JINWOO PAIR CODE
+
+                </div>
+
+
+                <div class="code">
+
+                    ${escapeHTML(currentCode)}
+
+                </div>
+
+
+                <div style="
+                    margin-top:7px;
+                ">
+
+                    ✓ Enter this code in WhatsApp
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        copy.classList.add(
+            "show"
+        );
+
+
+        startStatusPolling();
+
+
+    } catch(error) {
+
+        console.error(
+            "Pairing error:",
+            error
+        );
+
+
+        showError(
+            error.message ||
+            "Unable to generate pairing code."
+        );
+
+    } finally {
+
+        loading.classList.remove(
+            "show"
+        );
+
+        generate.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   STATUS POLLING
+========================================================= */
+
+function startStatusPolling() {
+
+    clearInterval(
+        statusTimer
+    );
+
+
+    let attempts = 0;
+
+
+    statusTimer =
+        setInterval(
+            async () => {
+
+                attempts++;
+
+
+                if(attempts > 60) {
+
+                    clearInterval(
+                        statusTimer
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            `/pair/status?number=${encodeURIComponent(
+                                currentNumber
+                            )}`
+                        );
+
+
+                    if(!response.ok) {
+
+                        return;
+
+                    }
+
+
+                    const data =
+                        await response.json();
+
+
+                    if(
+                        data.connected ||
+                        data.registered
+                    ) {
+
+                        clearInterval(
+                            statusTimer
+                        );
+
+
+                        status.className =
+                            "status success";
+
+
+                        status.innerHTML = `
+
+                            <div>
+
+                                <div style="
+                                    font-size:22px;
+                                    margin-bottom:7px;
+                                ">
+
+                                    ✓
+
+                                </div>
+
+
+                                <div>
+
+                                    JINWOO BOT CONNECTED
+
+                                </div>
+
+
+                                <div style="
+                                    margin-top:5px;
+                                    opacity:.7;
+                                ">
+
+                                    WhatsApp device linked successfully.
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+
+                } catch {
+
+                    /* Ignore polling errors */
+
+                }
+
+            },
+
+            3000
+
+        );
+
+}
+
+
+/* =========================================================
+   COPY
+========================================================= */
+
+copy.addEventListener(
+    "click",
+    async () => {
+
+        if(!currentCode) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                currentCode
+            );
+
+        } catch {
+
+            const textarea =
+                document.createElement(
+                    "textarea"
+                );
+
+
+            textarea.value =
+                currentCode;
+
+
+            textarea.style.position =
+                "fixed";
+
+            textarea.style.opacity =
+                "0";
+
+
+            document.body.appendChild(
+                textarea
+            );
+
+
+            textarea.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+            textarea.remove();
+
+        }
+
+
+        copy.classList.add(
+            "copied"
+        );
+
+
+        copy.innerHTML =
+            '<i class="fas fa-check"></i> Copied!';
+
+
+        setTimeout(
+            () => {
+
+                copy.classList.remove(
+                    "copied"
+                );
+
+                copy.innerHTML =
+                    '<i class="fas fa-copy"></i> Copy Pair Code';
+
+            },
+            1800
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showError(message) {
+
+    status.className =
+        "status error";
+
+
+    status.innerHTML = `
+
+        <i class="fas fa-circle-exclamation"></i>
+
+        &nbsp;
+
+        ${escapeHTML(message)}
+
+    `;
+
+
+    loading.classList.remove(
+        "show"
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replaceAll("&","&amp;")
+
+        .replaceAll("<","&lt;")
+
+        .replaceAll(">","&gt;")
+
+        .replaceAll('"',"&quot;")
+
+        .replaceAll("'","&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
